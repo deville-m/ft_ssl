@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:51:02 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/03 18:50:10 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/03 20:22:23 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 int	main(int ac, char *av[])
 {
 	t_flags		flags;
-	int			(*hash_f)(char *);
+	t_state		(*hash_f)(t_state, const char *);
 	t_dlist		*input_list;
 
 	if (ac == 1)

@@ -6,10 +6,13 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:30:58 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/03 13:33:17 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/03 20:27:04 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int md5(char *input){
-    return (1);
+#include "ft_ssl.h"
+
+t_state md5(t_state state, const char *buf)
+{
+    return (state);
 }

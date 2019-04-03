@@ -1,6 +1,6 @@
 NAME = ft_ssl
 CC = gcc
-CFLAGS = -Wall -Werror -O2
+CFLAGS = -Wall -Wextra -O2
 INCLUDES = -Iincludes/ -Ilibft/includes
 LDLIB = -Llibft/
 LDFLAGS = -lft

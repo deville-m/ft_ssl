@@ -6,11 +6,13 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:33:26 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/03 13:33:44 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/03 20:27:10 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int sha256(char *s)
+#include "ft_ssl.h"
+
+t_state sha256(t_state state, const char *buf)
 {
-    return (1);
+	return (state);
 }
