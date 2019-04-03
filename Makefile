@@ -10,6 +10,7 @@ LIBDIR = libft
 
 SRC =	main.c \
 		parse_cmd.c \
+		process_input.c \
 		crypto/md5.c \
 		crypto/sha256.c
 
