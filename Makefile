@@ -25,7 +25,7 @@ $(LIBDIR)/$(LIB):
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-$(NAME): $(OBJ) $(LIBDIR)/$(LIB)
+$(NAME): $(OBJ) $(LIBDIR)/$(LIB) includes/ft_ssl.h
 	$(CC) $(CFLAGS) -I$(INCLUDES) -o $@ $(OBJ) $(LDLIB) $(LDFLAGS)
 
 clean:

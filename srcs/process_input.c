@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 18:47:56 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/03 21:05:03 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/04 02:21:26 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,64 +17,48 @@
 #include "memory.h"
 #include "dlst.h"
 
-static t_state	init_md5(void)
+static int	padding(t_hash *hash, ssize_t ret, char *buf, size_t len)
 {
-	t_state state;
-
-	state.a = 0x67452301;
-	state.b = 0xEFCDAB89;
-	state.c = 0x98BADCFE;
-	state.d = 0x10325476;
-	return (state);
-}
-
-static t_state	init_sha256(void)
-{
-	t_state state = {0};
-
-	return (state);
-}
-
-static t_state	process_padding(
-							t_state state,
-							size_t ret,
-							char *buf,
-							t_state (*hash_f)(t_state, const char *))
-{
-	char	data[CHUNK_SIZE * 2];
-
-	ft_memcpy(data, buf, ret);
-	//padding here
-	state = hash_f(state, data);
-	if (ret > CHUNK_SIZE)
-		state = hash_f(state, date + CHUNK_SIZE);
-	return (state);
-}
-
-static int	basic_case(t_flags flags, t_state (*hash_f)(t_state, const char *))
-{
-	char 	buf[CHUNK_SIZE];
-	ssize_t	ret;
-	t_state	state;
-	size_t	len;
+	char	*data;
 	size_t	i;
 
-	if (hash_f == md5)
-	{
-		len = MD5_DIGEST_LENGTH;
-		state = init_md5();
-	}
-	else
-	{
-		len = SHA256_DIGEST_LENGTH;
-		state = init_sha256();
-	}
-	while ((ret = read(0, buf, CHUNK_SIZE)) == CHUNK_SIZE)
-		state = hash_f(state, buf);
-	state = process_padding(state, buf);
+	data = malloc(hash->chunk_len * 2);
+	ft_memcpy(data, buf, ret);
+	data[ret++] = 0x80;
+	//TODO hard coded 4
+	while (ret % hash->chunk_len != hash->chunk_len - 4)
+		data[ret++] = 0x00;
+	ft_memcpy(data + ret, &len, 4);
 	i = 0;
-	while (i < len)
-		ft_printf("%2.2hhx", ((char *)&state)[i++]);
+	while (i < 512 / 8)
+		ft_printf("%2.2hhx", data[i++]);
+	write(1, "\n", 1);
+	hash->hash_f(hash, data);
+	if (ret > hash->chunk_len)
+		hash->hash_f(hash, data + hash->chunk_len);
+	free(data);
+	return (1);
+}
+
+static int	basic_case(t_flags *flags, t_hash *hash)
+{
+	char	buf[64];
+	ssize_t	ret;
+	size_t	i;
+
+	//TODO hard coded buf
+	i = 0;
+	hash->init_f(hash);
+	while ((ret = read(0, buf, hash->chunk_len)) == hash->chunk_len)
+	{
+		hash->hash_f(hash, buf);
+		i += ret;
+	}
+	i += ret;
+	padding(hash, ret, buf, i);
+	i = 0;
+	while (i < hash->md_len)
+		ft_printf("%2.2hhx", hash->out[i++]);
 	write(1, "\n", 1);
 	return (0);
 }
@@ -94,13 +78,13 @@ static void	print_content(t_dlist *elem)
 
 int	process_input(
 		t_dlist *input_list,
-		t_flags flags,
-		t_state (*hash_f)(t_state, const char *))
+		t_flags *flags,
+		t_hash *hash)
 {
-	if (!flags.p &&
+	if (!flags->p &&
 		ft_dlstlen(input_list) == 1 &&
 		((t_input *)input_list->content)->type == STDIN)
-		return (basic_case(flags, hash_f));
+		return (basic_case(flags, hash));
 
 	//ft_dlstiter(input_list, print_content);
 	return (0);
