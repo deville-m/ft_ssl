@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:33:59 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/04 00:27:18 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/04 15:11:00 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int				init_sha256(t_hash *hash);
 int				sha256(t_hash *hash, const char *buf);
 
 t_dlist			*parse_cmd(t_flags *flags, int ac, char *argv[]);
-int				process_input(
+int				process_input_list(
 							t_dlist *lst,
 							t_flags *flags,
 							t_hash *hash);

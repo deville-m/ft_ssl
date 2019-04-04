@@ -6,33 +6,30 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 18:47:56 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/04 02:21:26 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/04 18:43:16 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include "ft_ssl.h"
+#include "ft_string.h"
 #include "ft_printf.h"
 #include "memory.h"
 #include "dlst.h"
 
-static int	padding(t_hash *hash, ssize_t ret, char *buf, size_t len)
+static int	padding(t_hash *hash, ssize_t ret, char *buf, uint64_t len)
 {
 	char	*data;
-	size_t	i;
 
 	data = malloc(hash->chunk_len * 2);
 	ft_memcpy(data, buf, ret);
 	data[ret++] = 0x80;
 	//TODO hard coded 4
-	while (ret % hash->chunk_len != hash->chunk_len - 4)
+	while (ret % hash->chunk_len != hash->chunk_len - 8)
 		data[ret++] = 0x00;
-	ft_memcpy(data + ret, &len, 4);
-	i = 0;
-	while (i < 512 / 8)
-		ft_printf("%2.2hhx", data[i++]);
-	write(1, "\n", 1);
+	ft_memcpy(data + ret, &len, sizeof(len));
 	hash->hash_f(hash, data);
 	if (ret > hash->chunk_len)
 		hash->hash_f(hash, data + hash->chunk_len);
@@ -40,52 +37,119 @@ static int	padding(t_hash *hash, ssize_t ret, char *buf, size_t len)
 	return (1);
 }
 
-static int	basic_case(t_flags *flags, t_hash *hash)
+static void	print_content(t_input *input)
 {
-	char	buf[64];
-	ssize_t	ret;
-	size_t	i;
-
-	//TODO hard coded buf
-	i = 0;
-	hash->init_f(hash);
-	while ((ret = read(0, buf, hash->chunk_len)) == hash->chunk_len)
-	{
-		hash->hash_f(hash, buf);
-		i += ret;
-	}
-	i += ret;
-	padding(hash, ret, buf, i);
-	i = 0;
-	while (i < hash->md_len)
-		ft_printf("%2.2hhx", hash->out[i++]);
-	write(1, "\n", 1);
-	return (0);
-}
-
-static void	print_content(t_dlist *elem)
-{
-	t_input *input;
-
-	input = (t_input *)elem->content;
 	if (input->type == STRING)
 		ft_printf("type: STRING - value: %s\n", input->str);
 	else if (input->type == _FILE)
 		ft_printf("type: FILE - name: %s\n", input->str);
 	else
 		ft_printf("type: STDIN\n");
+	free(input);
 }
 
-int	process_input(
+int digest_string(t_input *input, t_flags *flags, t_hash *hash)
+{
+	uint64_t i;
+	uint64_t len;
+
+	if (!flags->q && !flags->r)
+		ft_printf("%s (\"%s\") = ", hash->name, input->str);
+	hash->init_f(hash);
+	len = ft_strlen(input->str);
+	i = len;
+	while (i > 64)
+	{
+		hash->hash_f(hash, input->str + (len - i));
+		i -= 64;
+	}
+	padding(hash, i, input->str + (len - i), len * 8);
+	i = 0;
+	while (i < hash->md_len)
+		ft_printf("%2.2hhx", hash->out[i++]);
+	if (!flags->q && flags->r)
+		ft_printf(" \"%s\"", input->str);
+	return (1);
+}
+
+int	digest_fd(int fd, t_input *input, t_flags *flags, t_hash *hash)
+{
+	char		buf[4096];
+	ssize_t		ret;
+	uint64_t	i;
+
+	i = 0;
+	hash->init_f(hash);
+	while ((ret = read(fd, buf, hash->chunk_len)) == hash->chunk_len)
+	{
+		if (flags->p && input->type == STDIN)
+			write(1, buf, ret);
+		hash->hash_f(hash, buf);
+		i += ret;
+	}
+	if (flags->p && input->type == STDIN)
+		write(1, buf, ret);
+	i += ret;
+	padding(hash, ret, buf, i * 8);
+	i = 0;
+	while (i < hash->md_len)
+		ft_printf("%2.2hhx", hash->out[i++]);
+	return (1);
+}
+
+void	process_file(t_input *input, t_flags *flags, t_hash *hash)
+{
+	int fd;
+
+	if ((fd = open(input->str, O_RDONLY)) < 0)
+	{
+		ft_fprintf(
+				2,
+				"%s: %s: No such file or directory\n",
+				hash->name,
+				input->str);
+		return;
+	}
+	if (!flags->q && !flags->r)
+			ft_printf("%s (%s) = ", hash->name, input->str);
+	digest_fd(fd, input, flags, hash);
+	if (!flags->q && flags->r)
+		ft_printf(" %s", input->str);
+	close(fd);
+}
+
+int process_input(t_input *input, t_flags *flags, t_hash *hash)
+{
+	if (input->type == STDIN)
+		digest_fd(0, input, flags, hash);
+	else if (input->type == STRING)
+		digest_string(input, flags, hash);
+	else
+		process_file(input, flags, hash);
+	write(1, "\n", 1);
+	free(input);
+	return (1);
+}
+
+int	process_input_list(
 		t_dlist *input_list,
 		t_flags *flags,
 		t_hash *hash)
 {
+	t_dlist *to_free;
+	t_input *tmp;
+
 	if (!flags->p &&
 		ft_dlstlen(input_list) == 1 &&
 		((t_input *)input_list->content)->type == STDIN)
-		return (basic_case(flags, hash));
-
-	//ft_dlstiter(input_list, print_content);
+		return (digest_fd(0, (t_input *)input_list->content, flags, hash));
+	while (input_list != NULL)
+	{
+		to_free = input_list;
+		tmp = (t_input *)input_list->content;
+		process_input(tmp, flags, hash);
+		input_list = input_list->next;
+		free(to_free);
+	}
 	return (0);
 }
