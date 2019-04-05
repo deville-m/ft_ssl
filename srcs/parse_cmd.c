@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:51:11 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/03 19:04:21 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/05 13:36:13 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ static void	add_string(t_dlist **head, char *s)
 t_dlist		*parse_cmd(t_flags *flags, int ac, char *av[])
 {
 	t_dlist	*lst = NULL;
-	char	ch;
+	int		ch;
 
 	ft_bzero(flags, sizeof(t_flags));
 	while ((ch = ft_getopt(ac, av, "pqs:r")) != -1)

@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 18:47:56 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/04 18:43:16 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/05 16:52:44 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,51 +19,22 @@
 #include "memory.h"
 #include "dlst.h"
 
-static int	padding(t_hash *hash, ssize_t ret, char *buf, uint64_t len)
+int		digest_string(t_input *input, t_flags *flags, t_hash *hash)
 {
-	char	*data;
-
-	data = malloc(hash->chunk_len * 2);
-	ft_memcpy(data, buf, ret);
-	data[ret++] = 0x80;
-	//TODO hard coded 4
-	while (ret % hash->chunk_len != hash->chunk_len - 8)
-		data[ret++] = 0x00;
-	ft_memcpy(data + ret, &len, sizeof(len));
-	hash->hash_f(hash, data);
-	if (ret > hash->chunk_len)
-		hash->hash_f(hash, data + hash->chunk_len);
-	free(data);
-	return (1);
-}
-
-static void	print_content(t_input *input)
-{
-	if (input->type == STRING)
-		ft_printf("type: STRING - value: %s\n", input->str);
-	else if (input->type == _FILE)
-		ft_printf("type: FILE - name: %s\n", input->str);
-	else
-		ft_printf("type: STDIN\n");
-	free(input);
-}
-
-int digest_string(t_input *input, t_flags *flags, t_hash *hash)
-{
-	uint64_t i;
-	uint64_t len;
+	ssize_t		i;
+	uint64_t	len;
 
 	if (!flags->q && !flags->r)
 		ft_printf("%s (\"%s\") = ", hash->name, input->str);
 	hash->init_f(hash);
 	len = ft_strlen(input->str);
 	i = len;
-	while (i > 64)
+	while (i > hash->chunk_len)
 	{
 		hash->hash_f(hash, input->str + (len - i));
-		i -= 64;
+		i -= hash->chunk_len;
 	}
-	padding(hash, i, input->str + (len - i), len * 8);
+	hash->pad_f(hash, i, input->str + (len - i), len * 8);
 	i = 0;
 	while (i < hash->md_len)
 		ft_printf("%2.2hhx", hash->out[i++]);
@@ -72,11 +43,11 @@ int digest_string(t_input *input, t_flags *flags, t_hash *hash)
 	return (1);
 }
 
-int	digest_fd(int fd, t_input *input, t_flags *flags, t_hash *hash)
+int		digest_fd(int fd, t_input *input, t_flags *flags, t_hash *hash)
 {
 	char		buf[4096];
 	ssize_t		ret;
-	uint64_t	i;
+	ssize_t		i;
 
 	i = 0;
 	hash->init_f(hash);
@@ -90,7 +61,7 @@ int	digest_fd(int fd, t_input *input, t_flags *flags, t_hash *hash)
 	if (flags->p && input->type == STDIN)
 		write(1, buf, ret);
 	i += ret;
-	padding(hash, ret, buf, i * 8);
+	hash->pad_f(hash, ret, buf, i * 8);
 	i = 0;
 	while (i < hash->md_len)
 		ft_printf("%2.2hhx", hash->out[i++]);
@@ -108,17 +79,17 @@ void	process_file(t_input *input, t_flags *flags, t_hash *hash)
 				"%s: %s: No such file or directory\n",
 				hash->name,
 				input->str);
-		return;
+		return ;
 	}
 	if (!flags->q && !flags->r)
-			ft_printf("%s (%s) = ", hash->name, input->str);
+		ft_printf("%s (%s) = ", hash->name, input->str);
 	digest_fd(fd, input, flags, hash);
 	if (!flags->q && flags->r)
 		ft_printf(" %s", input->str);
 	close(fd);
 }
 
-int process_input(t_input *input, t_flags *flags, t_hash *hash)
+int		process_input(t_input *input, t_flags *flags, t_hash *hash)
 {
 	if (input->type == STDIN)
 		digest_fd(0, input, flags, hash);
@@ -131,10 +102,10 @@ int process_input(t_input *input, t_flags *flags, t_hash *hash)
 	return (1);
 }
 
-int	process_input_list(
-		t_dlist *input_list,
-		t_flags *flags,
-		t_hash *hash)
+int		process_input_list(
+					t_dlist *input_list,
+					t_flags *flags,
+					t_hash *hash)
 {
 	t_dlist *to_free;
 	t_input *tmp;
@@ -142,7 +113,13 @@ int	process_input_list(
 	if (!flags->p &&
 		ft_dlstlen(input_list) == 1 &&
 		((t_input *)input_list->content)->type == STDIN)
-		return (digest_fd(0, (t_input *)input_list->content, flags, hash));
+	{
+		digest_fd(0, (t_input *)input_list->content, flags, hash);
+		write(1, "\n", 1);
+		free((t_input *)input_list->content);
+		free(input_list);
+		return (0);
+	}
 	while (input_list != NULL)
 	{
 		to_free = input_list;
