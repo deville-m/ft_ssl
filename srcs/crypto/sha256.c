@@ -6,11 +6,12 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:33:26 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/05 17:12:58 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/05 18:36:57 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
+#include "ft_printf.h"
 #include "memory.h"
 
 static const uint32_t g_k[] = {
@@ -80,6 +81,11 @@ uint32_t	delta_1_256(uint32_t x)
 	return (rotate_right(x, 17) ^ rotate_right(x, 19) ^ (x >> 10));
 }
 
+uint32_t	swap_bytes(uint32_t x)
+{
+	return (((x>>24)&0xff) | ((x<<8)&0xff0000) | ((x>>8)&0xff00) | ((x<<24)&0xff000000));
+}
+
 int		sha256(t_hash *hash, const char *chunk)
 {
 	uint32_t	tmp[8];
@@ -90,6 +96,12 @@ int		sha256(t_hash *hash, const char *chunk)
 
 	ft_memcpy(tmp, hash->state, 8 * sizeof(uint32_t));
 	m = (uint32_t *)chunk;
+	i = 0;
+	while (i < 16)
+	{
+		m[i] = swap_bytes(m[i]);
+		i++;
+	}
 	i = 0;
 	while (i < 64)
 	{
