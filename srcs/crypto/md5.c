@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:30:58 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/05 16:37:20 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/08 14:36:26 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,8 @@ int			init_md5(t_hash *hash)
 	hash->md_len = 16;
 	hash->chunk_len = 64;
 	hash->hash_f = md5;
-	hash->pad_f = pad_512;
+	hash->pad_f = pad_md5;
+	hash->final_f = final_md5;
 	hash->out = (char *)hash->state;
 	return (1);
 }

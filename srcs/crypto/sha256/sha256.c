@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:33:26 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 13:37:32 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/08 14:36:46 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static const uint32_t g_k[] = {
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-int		init_sha256(t_hash *hash)
+int			init_sha256(t_hash *hash)
 {
 	hash->state[0] = 0x6a09e667;
 	hash->state[1] = 0xbb67ae85;
@@ -40,74 +40,22 @@ int		init_sha256(t_hash *hash)
 	hash->md_len = 32;
 	hash->chunk_len = 64;
 	hash->hash_f = sha256;
-	hash->pad_f = pad_1024;
+	hash->pad_f = pad_sha;
+	hash->final_f = final_sha256;
 	hash->out = (char *)hash->state;
 	return (1);
 }
 
-uint32_t	rotate_right(uint32_t n, uint32_t d)
+static void	round_sha(uint32_t *tmp, uint32_t *w)
 {
-	return ((n >> d) | (n << (32 - d)));
-}
-
-uint32_t	ch_256(uint32_t x, uint32_t y, uint32_t z)
-{
-	return ((x & y) ^ (~x & z));
-}
-
-uint32_t	maj_256(uint32_t x, uint32_t y, uint32_t z)
-{
-	return ((x & y) ^ (x & z) ^ (y & z));
-}
-
-uint32_t	eps_0_256(uint32_t x)
-{
-	return (rotate_right(x, 2) ^ rotate_right(x, 13) ^ rotate_right(x, 22));
-}
-
-uint32_t	eps_1_256(uint32_t x)
-{
-	return (rotate_right(x, 6) ^ rotate_right(x, 11) ^ rotate_right(x, 25));
-}
-
-uint32_t	sigma_0_256(uint32_t x)
-{
-	return (rotate_right(x, 7) ^ rotate_right(x, 18) ^ (x >> 3));
-}
-
-uint32_t	sigma_1_256(uint32_t x)
-{
-	return (rotate_right(x, 17) ^ rotate_right(x, 19) ^ (x >> 10));
-}
-
-uint32_t	swap_bytes(uint32_t x)
-{
-	return (((x>>24)&0xff) | ((x<<8)&0xff0000) | ((x>>8)&0xff00) | ((x<<24)&0xff000000));
-}
-
-int		sha256(t_hash *hash, const char *chunk)
-{
-	uint32_t	tmp[8];
-	uint32_t	w[64];
-	uint32_t	*m;
-	uint32_t	i;
 	uint32_t	temp[2];
+	size_t		i;
 
-	ft_memcpy(tmp, hash->state, 8 * sizeof(uint32_t));
-	m = (uint32_t *)chunk;
 	i = 0;
 	while (i < 64)
 	{
-		if (i < 16)
-			w[i] = swap_bytes(m[i]);
-		else
-			w[i] = sigma_1_256(w[i - 2]) + w[i - 7] + sigma_0_256(w[i - 15]) + w[i - 16];
-		i++;
-	}
-	i = 0;
-	while (i < 64)
-	{
-		temp[0] = tmp[7] + eps_1_256(tmp[4]) + ch_256(tmp[4], tmp[5], tmp[6]) + g_k[i] + w[i];
+		temp[0] = tmp[7] + eps_1_256(tmp[4]);
+		temp[0] += ch_256(tmp[4], tmp[5], tmp[6]) + g_k[i] + w[i];
 		temp[1] = eps_0_256(tmp[0]) + maj_256(tmp[0], tmp[1], tmp[2]);
 		tmp[7] = tmp[6];
 		tmp[6] = tmp[5];
@@ -119,6 +67,37 @@ int		sha256(t_hash *hash, const char *chunk)
 		tmp[0] = temp[0] + temp[1];
 		i++;
 	}
+}
+
+static void	init_w(uint32_t *w, uint32_t *m)
+{
+	size_t i;
+
+	i = 0;
+	while (i < 64)
+	{
+		if (i < 16)
+			w[i] = byte_swap_32(m[i]);
+		else
+		{
+			w[i] = sigma_1_256(w[i - 2]) + w[i - 7];
+			w[i] += sigma_0_256(w[i - 15]) + w[i - 16];
+		}
+		i++;
+	}
+}
+
+int			sha256(t_hash *hash, const char *chunk)
+{
+	uint32_t	tmp[8];
+	uint32_t	w[64];
+	uint32_t	*m;
+	uint32_t	i;
+
+	ft_memcpy(tmp, hash->state, 8 * sizeof(uint32_t));
+	m = (uint32_t *)chunk;
+	init_w(w, m);
+	round_sha(tmp, w);
 	i = 0;
 	while (i < 8)
 	{

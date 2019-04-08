@@ -6,49 +6,43 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:51:11 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/05 13:36:13 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/08 14:54:16 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <fcntl.h>
 #include "ft_ssl.h"
-#include "ft_printf.h"
 #include "ft_getopt.h"
 #include "dlst.h"
 #include "memory.h"
 
-static void	add_file(t_dlist **head, char *name, char *digest)
+static void		add_file(t_dlist **head, char *name)
 {
 	t_input	input;
-	int		fd;
 
-	if ((fd = open(name, O_RDONLY)) < 0)
-	{
-		ft_fprintf(2, "%s: %s: No such file or directory\n", digest, name);
-		return;
-	}
 	input.type = _FILE;
 	input.str = name;
-	input.fd = fd;
 	ft_dlstappend(head, ft_dlstnew(&input, sizeof(input)));
 }
 
-static void	add_stdin(t_dlist **head, char *digest)
+static t_dlist	*add_stdin(t_dlist **head, char *digest)
 {
 	t_input	input;
 
 	if (read(0, NULL, 0) < 0)
 	{
 		ft_fprintf(2, "%s: cannot read stdin\n", digest);
+		return (*head);
 	}
 	input.type = STDIN;
 	input.str = NULL;
 	input.fd = 0;
 	ft_dlstappend(head, ft_dlstnew(&input, sizeof(input)));
+	return (*head);
 }
 
-static void	add_string(t_dlist **head, char *s)
+static void		add_string(t_dlist **head, char *s)
 {
 	t_input input;
 
@@ -58,11 +52,12 @@ static void	add_string(t_dlist **head, char *s)
 	ft_dlstappend(head, ft_dlstnew(&input, sizeof(input)));
 }
 
-t_dlist		*parse_cmd(t_flags *flags, int ac, char *av[])
+t_dlist			*parse_cmd(t_flags *flags, int ac, char *av[])
 {
-	t_dlist	*lst = NULL;
+	t_dlist	*lst;
 	int		ch;
 
+	lst = NULL;
 	ft_bzero(flags, sizeof(t_flags));
 	while ((ch = ft_getopt(ac, av, "pqs:r")) != -1)
 	{
@@ -81,8 +76,7 @@ t_dlist		*parse_cmd(t_flags *flags, int ac, char *av[])
 			return (NULL);
 	}
 	while (g_optind < ac)
-		add_file(&lst, av[g_optind++], av[0]);
-	if (lst == NULL)
-		add_stdin(&lst, av[0]);
+		add_file(&lst, av[g_optind++]);
+	lst = (lst == NULL) ? add_stdin(&lst, av[0]) : lst;
 	return (lst);
 }

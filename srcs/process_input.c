@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 18:47:56 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/05 16:52:44 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/08 14:55:14 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,7 @@ int		digest_string(t_input *input, t_flags *flags, t_hash *hash)
 		i -= hash->chunk_len;
 	}
 	hash->pad_f(hash, i, input->str + (len - i), len * 8);
-	i = 0;
-	while (i < hash->md_len)
-		ft_printf("%2.2hhx", hash->out[i++]);
+	hash->final_f(hash);
 	if (!flags->q && flags->r)
 		ft_printf(" \"%s\"", input->str);
 	return (1);
@@ -62,9 +60,7 @@ int		digest_fd(int fd, t_input *input, t_flags *flags, t_hash *hash)
 		write(1, buf, ret);
 	i += ret;
 	hash->pad_f(hash, ret, buf, i * 8);
-	i = 0;
-	while (i < hash->md_len)
-		ft_printf("%2.2hhx", hash->out[i++]);
+	hash->final_f(hash);
 	return (1);
 }
 
@@ -76,7 +72,7 @@ void	process_file(t_input *input, t_flags *flags, t_hash *hash)
 	{
 		ft_fprintf(
 				2,
-				"%s: %s: No such file or directory\n",
+				"%s: %s: No such file or directory",
 				hash->name,
 				input->str);
 		return ;
