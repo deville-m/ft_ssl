@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:33:59 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 14:35:44 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/08 15:14:42 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,9 @@ int				md5(t_hash *hash, const char *buf);
 
 int				init_sha256(t_hash *hash);
 int				sha256(t_hash *hash, const char *buf);
+
+int				init_sha224(t_hash *hash);
+
 uint32_t		rotate_right(uint32_t n, uint32_t d);
 uint32_t		eps_1_256(uint32_t x);
 uint32_t		eps_0_256(uint32_t x);

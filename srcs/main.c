@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:51:02 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 14:12:26 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/08 15:22:19 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ int	set_init(t_hash *hash, char *name)
 		hash->init_f = init_md5;
 	else if (ft_strequ(name, "sha256"))
 		hash->init_f = init_sha256;
+	else if (ft_strequ(name, "sha224"))
+		hash->init_f = init_sha224;
 	else
 		return (0);
 	i = 0;
@@ -44,12 +46,12 @@ int	main(int ac, char *av[])
 
 	if (ac == 1)
 	{
-		ft_fprintf(2, "usage: %s md5|sha256 [-sp [-q | -r]]\n", av[0]);
+		ft_fprintf(2, "usage: %s md5|sha256|sha224 [-pqr] [-s string]\n", av[0]);
 		return (1);
 	}
 	if (set_init(&hash, av[1]) == 0)
 	{
-		ft_fprintf(2, "usage: %s md5|sha256 [-sp [-q | -r]]\n", av[0]);
+		ft_fprintf(2, "usage: %s md5|sha256|sha224 [-pqr] [-s string]\n", av[0]);
 		return (1);
 	}
 	input_list = parse_cmd(&flags, ac - 1, av + 1);

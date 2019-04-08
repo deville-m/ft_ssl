@@ -16,7 +16,8 @@ SRC =	main.c \
 		crypto/md5.c \
 		crypto/sha256/sha256.c \
 		crypto/sha256/sha256_2.c \
-		crypto/sha256/sha256_3.c
+		crypto/sha256/sha256_3.c \
+		crypto/sha256/sha224.c
 
 SRC := $(addprefix $(SRCDIR), $(SRC))
 OBJ := $(SRC:.c=.o)
