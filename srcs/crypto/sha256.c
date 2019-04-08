@@ -6,12 +6,11 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:33:26 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/05 18:36:57 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/08 13:37:32 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
-#include "ft_printf.h"
 #include "memory.h"
 
 static const uint32_t g_k[] = {
@@ -58,25 +57,25 @@ uint32_t	ch_256(uint32_t x, uint32_t y, uint32_t z)
 
 uint32_t	maj_256(uint32_t x, uint32_t y, uint32_t z)
 {
-	return ((x & y) ^ (x & z) ^ (y ^ z));
+	return ((x & y) ^ (x & z) ^ (y & z));
 }
 
-uint32_t	sigma_0_256(uint32_t x)
+uint32_t	eps_0_256(uint32_t x)
 {
 	return (rotate_right(x, 2) ^ rotate_right(x, 13) ^ rotate_right(x, 22));
 }
 
-uint32_t	sigma_1_256(uint32_t x)
+uint32_t	eps_1_256(uint32_t x)
 {
 	return (rotate_right(x, 6) ^ rotate_right(x, 11) ^ rotate_right(x, 25));
 }
 
-uint32_t	delta_0_256(uint32_t x)
+uint32_t	sigma_0_256(uint32_t x)
 {
 	return (rotate_right(x, 7) ^ rotate_right(x, 18) ^ (x >> 3));
 }
 
-uint32_t	delta_1_256(uint32_t x)
+uint32_t	sigma_1_256(uint32_t x)
 {
 	return (rotate_right(x, 17) ^ rotate_right(x, 19) ^ (x >> 10));
 }
@@ -97,25 +96,19 @@ int		sha256(t_hash *hash, const char *chunk)
 	ft_memcpy(tmp, hash->state, 8 * sizeof(uint32_t));
 	m = (uint32_t *)chunk;
 	i = 0;
-	while (i < 16)
-	{
-		m[i] = swap_bytes(m[i]);
-		i++;
-	}
-	i = 0;
 	while (i < 64)
 	{
-		if (i <= 15)
-			w[i] = m[i];
+		if (i < 16)
+			w[i] = swap_bytes(m[i]);
 		else
-			w[i] = delta_1_256(w[i - 2]) + w[i - 7] + delta_0_256(w[i - 15]) + w[i - 16];
+			w[i] = sigma_1_256(w[i - 2]) + w[i - 7] + sigma_0_256(w[i - 15]) + w[i - 16];
 		i++;
 	}
 	i = 0;
 	while (i < 64)
 	{
-		temp[0] = tmp[7] + sigma_1_256(tmp[4]) + ch_256(tmp[4], tmp[5], tmp[6]) + g_k[i] + w[i];
-		temp[1] = sigma_0_256(tmp[0]) + maj_256(tmp[0], tmp[1], tmp[2]);
+		temp[0] = tmp[7] + eps_1_256(tmp[4]) + ch_256(tmp[4], tmp[5], tmp[6]) + g_k[i] + w[i];
+		temp[1] = eps_0_256(tmp[0]) + maj_256(tmp[0], tmp[1], tmp[2]);
 		tmp[7] = tmp[6];
 		tmp[6] = tmp[5];
 		tmp[5] = tmp[4];
