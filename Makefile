@@ -17,7 +17,11 @@ SRC =	main.c \
 		crypto/sha256/sha256.c \
 		crypto/sha256/sha256_2.c \
 		crypto/sha256/sha256_3.c \
-		crypto/sha256/sha224.c
+		crypto/sha256/sha224.c \
+		crypto/sha512/sha512.c \
+		crypto/sha512/sha512_2.c \
+		crypto/sha512/sha512_3.c \
+		crypto/sha512/sha384.c
 
 SRC := $(addprefix $(SRCDIR), $(SRC))
 OBJ := $(SRC:.c=.o)
@@ -27,10 +31,10 @@ all: $(NAME)
 $(LIBDIR)/$(LIB):
 	@$(MAKE) -j8 -C $(LIBDIR)
 
-%.o: %.c
+%.o: %.c includes/ft_ssl.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-$(NAME): $(OBJ) $(LIBDIR)/$(LIB) includes/ft_ssl.h
+$(NAME): $(OBJ) $(LIBDIR)/$(LIB)
 	$(CC) $(CFLAGS) -I$(INCLUDES) -o $@ $(OBJ) $(LDLIB) $(LDFLAGS)
 
 clean:

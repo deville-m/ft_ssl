@@ -1,23 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sha256_3.c                                         :+:      :+:    :+:   */
+/*   sha512_3.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 13:53:46 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 15:59:13 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/08 17:05:36 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
 
-uint32_t	sigma_0_256(uint32_t x)
+uint64_t	sigma_0_512(uint64_t x)
 {
-	return (rotate_right_32(x, 7) ^ rotate_right_32(x, 18) ^ (x >> 3));
+	return (rotate_right_64(x, 1) ^ rotate_right_64(x, 8) ^ (x >> 7));
 }
 
-uint32_t	sigma_1_256(uint32_t x)
+uint64_t	sigma_1_512(uint64_t x)
 {
-	return (rotate_right_32(x, 17) ^ rotate_right_32(x, 19) ^ (x >> 10));
+	return (rotate_right_64(x, 19) ^ rotate_right_64(x, 61) ^ (x >> 6));
 }

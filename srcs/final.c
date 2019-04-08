@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 14:30:58 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 14:40:23 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/08 16:44:59 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,22 @@ int		final_sha256(t_hash *hash)
 	while (i < 8)
 	{
 		hash->state[i] = byte_swap_32(hash->state[i]);
+		i++;
+	}
+	i = 0;
+	while (i < hash->md_len)
+		ft_printf("%2.2hhx", hash->out[i++]);
+	return (1);
+}
+
+int		final_sha512(t_hash *hash)
+{
+	ssize_t i;
+
+	i = 0;
+	while (i < 8)
+	{
+		hash->lstate[i] = byte_swap_64(hash->lstate[i]);
 		i++;
 	}
 	i = 0;

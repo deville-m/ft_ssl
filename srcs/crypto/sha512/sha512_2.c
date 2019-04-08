@@ -1,42 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sha256_2.c                                         :+:      :+:    :+:   */
+/*   sha512_2.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 13:52:35 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 15:58:49 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/08 17:01:24 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
 
-uint32_t	rotate_right_32(uint32_t n, uint32_t d)
+uint64_t	rotate_right_64(uint64_t n, uint64_t d)
 {
-	return ((n >> d) | (n << (32 - d)));
+	return ((n >> d) | (n << (64 - d)));
 }
 
-uint32_t	ch_256(uint32_t x, uint32_t y, uint32_t z)
+uint64_t	ch_512(uint64_t x, uint64_t y, uint64_t z)
 {
 	return ((x & y) ^ (~x & z));
 }
 
-uint32_t	maj_256(uint32_t x, uint32_t y, uint32_t z)
+uint64_t	maj_512(uint64_t x, uint64_t y, uint64_t z)
 {
 	return ((x & y) ^ (x & z) ^ (y & z));
 }
 
-uint32_t	eps_0_256(uint32_t x)
+uint64_t	eps_0_512(uint64_t x)
 {
-	return (rotate_right_32(x, 2)
-			^ rotate_right_32(x, 13)
-			^ rotate_right_32(x, 22));
+	return (rotate_right_64(x, 28)
+			^ rotate_right_64(x, 34)
+			^ rotate_right_64(x, 39));
 }
 
-uint32_t	eps_1_256(uint32_t x)
+uint64_t	eps_1_512(uint64_t x)
 {
-	return (rotate_right_32(x, 6)
-			^ rotate_right_32(x, 11)
-			^ rotate_right_32(x, 25));
+	return (rotate_right_64(x, 14)
+			^ rotate_right_64(x, 18)
+			^ rotate_right_64(x, 41));
 }
