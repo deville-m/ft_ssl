@@ -6,13 +6,13 @@
 #    By: tvallee <tvallee@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/12/10 14:41:44 by tvallee           #+#    #+#              #
-#    Updated: 2018/06/12 17:57:32 by mdeville         ###   ########.fr        #
+#    Updated: 2019/04/09 17:03:27 by mdeville         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME            = libft.a
 CC              = gcc
-CFLAGS         += -Wall -Wextra -Werror
+CFLAGS         += -Wall -Wextra -Werror -O2
 SRCDIR          = srcs/
 OBJDIR          = .obj/
 INCDIR          = includes/

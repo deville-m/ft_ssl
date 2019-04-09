@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:33:26 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 14:36:46 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/09 10:48:46 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ int			init_sha256(t_hash *hash)
 	return (1);
 }
 
-static void	round_sha(uint32_t *tmp, uint32_t *w)
+static void	rounds(uint32_t *tmp, uint32_t *w)
 {
 	uint32_t	temp[2];
 	size_t		i;
@@ -97,7 +97,7 @@ int			sha256(t_hash *hash, const char *chunk)
 	ft_memcpy(tmp, hash->state, 8 * sizeof(uint32_t));
 	m = (uint32_t *)chunk;
 	init_w(w, m);
-	round_sha(tmp, w);
+	rounds(tmp, w);
 	i = 0;
 	while (i < 8)
 	{

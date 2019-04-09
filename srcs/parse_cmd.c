@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:51:11 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 18:27:06 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/09 16:55:53 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,20 @@ static void		add_string(t_dlist **head, char *s)
 	ft_dlstappend(head, ft_dlstnew(&input, sizeof(input)));
 }
 
+static t_dlist	*cleanup(t_dlist *lst)
+{
+	t_dlist	*tmp;
+
+	while (lst != NULL)
+	{
+		tmp = lst;
+		free(lst->content);
+		lst = lst->next;
+		free(tmp);
+	}
+	return (NULL);
+}
+
 t_dlist			*parse_cmd(t_flags *flags, int ac, char *av[])
 {
 	t_dlist	*lst;
@@ -74,7 +88,7 @@ t_dlist			*parse_cmd(t_flags *flags, int ac, char *av[])
 		else if (ch == 's')
 			add_string(&lst, g_optarg);
 		else
-			return (NULL);
+			return (cleanup(lst));
 	}
 	while (g_optind < ac)
 		add_file(&lst, av[g_optind++]);

@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:33:26 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 16:57:12 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/09 10:48:31 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int			init_sha512(t_hash *hash)
 	return (1);
 }
 
-static void	round_sha(uint64_t *tmp, uint64_t *w)
+static void	rounds(uint64_t *tmp, uint64_t *w)
 {
 	uint64_t	temp[2];
 	size_t		i;
@@ -113,7 +113,7 @@ int			sha512(t_hash *hash, const char *chunk)
 	ft_memcpy(tmp, hash->lstate, 8 * sizeof(uint64_t));
 	m = (uint64_t *)chunk;
 	init_w(w, m);
-	round_sha(tmp, w);
+	rounds(tmp, w);
 	i = 0;
 	while (i < 8)
 	{
