@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 13:33:59 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 17:42:33 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/11 13:29:35 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,8 @@ uint32_t		byte_swap_32(uint32_t x);
 uint64_t		byte_swap_64(uint64_t x);
 
 int				pad_md5(t_hash *hash, ssize_t ret, char *buf, uint64_t len);
-int				pad_sha(t_hash *hash, ssize_t ret, char *buf, uint64_t len);
+int				pad_sha256(t_hash *hash, ssize_t ret, char *buf, uint64_t len);
+int				pad_sha512(t_hash *hash, ssize_t ret, char *buf, uint64_t len);
 
 int				final_md5(t_hash *hash);
 int				final_sha256(t_hash *hash);

@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 15:10:12 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 15:17:16 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/11 13:29:05 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int			init_sha224(t_hash *hash)
 	hash->md_len = 28;
 	hash->chunk_len = 64;
 	hash->hash_f = sha256;
-	hash->pad_f = pad_sha;
+	hash->pad_f = pad_sha256;
 	hash->final_f = final_sha256;
 	hash->out = (char *)hash->state;
 	return (1);

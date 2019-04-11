@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 15:57:25 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 16:56:04 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/11 13:27:59 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ uint32_t	byte_swap_32(uint32_t x)
 
 int			pad_md5(t_hash *hash, ssize_t ret, char *buf, uint64_t len)
 {
-	char	data[1024];
+	char	data[128];
 
 	ft_memcpy(data, buf, ret);
 	data[ret++] = 0x80;
@@ -45,14 +45,32 @@ int			pad_md5(t_hash *hash, ssize_t ret, char *buf, uint64_t len)
 	return (1);
 }
 
-int			pad_sha(t_hash *hash, ssize_t ret, char *buf, uint64_t len)
+int			pad_sha256(t_hash *hash, ssize_t ret, char *buf, uint64_t len)
 {
-	char		data[2048];
+	char		data[128];
 
 	ft_memcpy(data, buf, ret);
 	data[ret++] = 0x80;
 	while (ret % hash->chunk_len != hash->chunk_len - 8)
 		data[ret++] = 0x00;
+	len = byte_swap_64(len);
+	ft_memcpy(data + ret, &len, sizeof(len));
+	hash->hash_f(hash, data);
+	if (ret > hash->chunk_len)
+		hash->hash_f(hash, data + hash->chunk_len);
+	return (1);
+}
+
+int			pad_sha512(t_hash *hash, ssize_t ret, char *buf, uint64_t len)
+{
+	char		data[256];
+
+	ft_memcpy(data, buf, ret);
+	data[ret++] = 0x80;
+	while (ret % hash->chunk_len != hash->chunk_len - 16)
+		data[ret++] = 0x00;
+	ft_memset(data + ret, 0, 8);
+	ret += 8;
 	len = byte_swap_64(len);
 	ft_memcpy(data + ret, &len, sizeof(len));
 	hash->hash_f(hash, data);
