@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 18:47:56 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 16:48:03 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/12 14:07:15 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,14 @@ void	process_file(t_input *input, t_flags *flags, t_hash *hash)
 				"%s: %s: No such file or directory",
 				hash->name,
 				input->str);
+		return ;
+	}
+	if (read(fd, NULL, 0) < 0)
+	{
+		ft_fprintf(2, "%s: %s: Is a directory",
+				hash->name,
+				input->str);
+		close(fd);
 		return ;
 	}
 	if (!flags->q && !flags->r)
