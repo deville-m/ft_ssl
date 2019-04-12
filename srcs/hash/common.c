@@ -6,12 +6,12 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/05 15:57:25 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/11 13:27:59 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/12 18:03:24 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdint.h>
-#include "ft_ssl.h"
+#include "ft_hash.h"
 #include "memory.h"
 
 uint64_t	byte_swap_64(uint64_t x)

@@ -6,11 +6,11 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 13:53:46 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 17:05:36 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/12 18:04:45 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ssl.h"
+#include "ft_hash.h"
 
 uint64_t	sigma_0_512(uint64_t x)
 {

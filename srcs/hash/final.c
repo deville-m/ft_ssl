@@ -6,11 +6,11 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 14:30:58 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 16:44:59 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/12 18:03:28 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ssl.h"
+#include "ft_hash.h"
 #include "ft_printf.h"
 
 int		final_md5(t_hash *hash)

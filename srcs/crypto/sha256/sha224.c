@@ -6,11 +6,11 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 15:10:12 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/11 13:29:05 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/12 18:03:59 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ssl.h"
+#include "ft_hash.h"
 
 int			init_sha224(t_hash *hash)
 {

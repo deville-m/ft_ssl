@@ -6,11 +6,11 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/08 13:52:35 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/08 17:01:24 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/12 18:04:37 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ssl.h"
+#include "ft_hash.h"
 
 uint64_t	rotate_right_64(uint64_t n, uint64_t d)
 {

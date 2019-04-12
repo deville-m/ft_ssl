@@ -9,10 +9,11 @@ LIB = libft.a
 LIBDIR = libft
 
 SRC =	main.c \
-		parse_cmd.c \
-		process_input.c \
-		common.c \
-		final.c \
+		hash/hash_main.c \
+		hash/parse_cmd.c \
+		hash/process_input.c \
+		hash/common.c \
+		hash/final.c \
 		crypto/md5.c \
 		crypto/sha256/sha256.c \
 		crypto/sha256/sha256_2.c \
