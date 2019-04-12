@@ -6,7 +6,7 @@
 /*   By: mdeville <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/03 18:47:56 by mdeville          #+#    #+#             */
-/*   Updated: 2019/04/12 14:07:15 by mdeville         ###   ########.fr       */
+/*   Updated: 2019/04/12 15:02:45 by mdeville         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,23 +45,29 @@ int		digest_fd(int fd, t_input *input, t_flags *flags, t_hash *hash)
 {
 	char		buf[4096];
 	ssize_t		ret;
+	ssize_t		total;
 	ssize_t		i;
 
+	total = 0;
 	i = 0;
-	hash->init_f(hash);
-	while ((ret = read(fd, buf, hash->chunk_len)) == hash->chunk_len)
+	while ((ret = read(fd, buf + i, hash->chunk_len)) > 0)
 	{
 		if (flags->p && input->type == STDIN)
 			write(1, buf, ret);
-		hash->hash_f(hash, buf);
-		i += ret;
+		total += ret;
+		if (ret < hash->chunk_len)
+			i += ret;
+		else
+			hash->hash_f(hash, buf);
+		if (i > hash->chunk_len)
+		{
+			i -= hash->chunk_len;
+			hash->hash_f(hash, buf);
+			ft_memmove(buf, buf + hash->chunk_len, i);
+		}
 	}
-	if (flags->p && input->type == STDIN)
-		write(1, buf, ret);
-	i += ret;
-	hash->pad_f(hash, ret, buf, i * 8);
-	hash->final_f(hash);
-	return (1);
+	hash->pad_f(hash, i, buf, total * 8);
+	return (hash->final_f(hash));
 }
 
 void	process_file(t_input *input, t_flags *flags, t_hash *hash)
@@ -118,6 +124,7 @@ int		process_input_list(
 		ft_dlstlen(input_list) == 1 &&
 		((t_input *)input_list->content)->type == STDIN)
 	{
+		hash->init_f(hash);
 		digest_fd(0, (t_input *)input_list->content, flags, hash);
 		write(1, "\n", 1);
 		free((t_input *)input_list->content);
@@ -126,6 +133,7 @@ int		process_input_list(
 	}
 	while (input_list != NULL)
 	{
+		hash->init_f(hash);
 		to_free = input_list;
 		tmp = (t_input *)input_list->content;
 		process_input(tmp, flags, hash);
